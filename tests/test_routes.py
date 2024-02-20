@@ -181,9 +181,12 @@ class TestProductRoutes(TestCase):
 
     def test_update_product(self):
         """It should Update an existing Product"""
+        # create a product to update
         test_product = ProductFactory()
         response = self.client.post(BASE_URL, json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # update the product
         new_product = response.get_json()
         new_product["description"] = "unknown"
         response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
@@ -193,24 +196,17 @@ class TestProductRoutes(TestCase):
 
     def test_delete_product(self):
         """It should Delete a Product"""
-        # Ensure there's at least one product to delete
         products = self._create_products(5)
-        initial_product_count = self.get_product_count()
-        self.assertGreater(initial_product_count, 0, "Initial product count should be greater than 0.")
+        product_count = self.get_product_count()
         test_product = products[0]
-
-        # Attempt to delete the product
         response = self.client.delete(f"{BASE_URL}/{test_product.id}")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, "Product deletion failed.")
-        self.assertEqual(len(response.data), 0, "Response data should be empty after deletion.")
-
-        # Verify the product has been deleted
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND, "Deleted product should not be found.")
-
-        # Verify the total product count has decreased by one
-        new_product_count = self.get_product_count()
-        self.assertEqual(new_product_count, initial_product_count - 1, "Product count should decrease by one after deletion.")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        new_count = self.get_product_count()
+        self.assertEqual(new_count, product_count - 1)
 
     def test_get_product_list(self):
         """It should Get a list of Products"""
@@ -242,7 +238,6 @@ class TestProductRoutes(TestCase):
         found = [product for product in products if product.category == category]
         found_count = len(found)
         logging.debug("Found Products [%d] %s", found_count, found)
-
         # test for available
         response = self.client.get(BASE_URL, query_string=f"category={category.name}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

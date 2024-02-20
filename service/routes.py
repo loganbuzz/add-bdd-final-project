@@ -20,7 +20,7 @@ Product Store Service with UI
 """
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 from urllib.parse import quote_plus
@@ -104,6 +104,8 @@ def list_products():
 
     products = []
     name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
 
     if name:
         app.logger.info("Find by name: %s", name)
@@ -144,28 +146,30 @@ def get_products(product_id):
 
 
 ######################################################################
-# U P D A T E   A   P R O D U C T
+# UPDATE AN EXISTING PRODUCT
 ######################################################################
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_products(product_id):
     """
     Update a Product
+
     This endpoint will update a Product based the body that is posted
     """
     app.logger.info("Request to Update a product with id [%s]", product_id)
     check_content_type("application/json")
+
     product = Product.find(product_id)
     if not product:
         abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+
     product.deserialize(request.get_json())
     product.id = product_id
     product.update()
     return product.serialize(), status.HTTP_200_OK
 
 ######################################################################
-# D E L E T E   A   P R O D U C T
+# DELETE A PRODUCT
 ######################################################################
-
 @app.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_products(product_id):
     """
@@ -180,4 +184,3 @@ def delete_products(product_id):
         product.delete()
 
     return "", status.HTTP_204_NO_CONTENT
-
