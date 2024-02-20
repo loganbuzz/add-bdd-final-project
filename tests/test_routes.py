@@ -167,6 +167,20 @@ class TestProductRoutes(TestCase):
     # ADD YOUR TEST CASES HERE
     #
 
+    def test_get_product(self):
+        """It should Get a single Product"""
+        test_product = self._create_products(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_product.name)
+    
+    def test_update_product(self):
+
+    def test_delete_product(self):
+
+    def test_list_all_products(self):
+
     ######################################################################
     # Utility functions
     ######################################################################

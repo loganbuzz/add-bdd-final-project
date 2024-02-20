@@ -106,9 +106,7 @@ def create_products():
 # R E A D   A   P R O D U C T
 ######################################################################
 
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT
-#
+
 
 ######################################################################
 # U P D A T E   A   P R O D U C T
